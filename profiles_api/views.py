@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication #this is the kind of token that users will use to authenticate themselves
+from rest_framework import filters
 from . import permissions
 from profiles_api import serializers
 from . import models
@@ -103,3 +104,5 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = models.UserProfile.objects.all()
     authentication_classes = (TokenAuthentication,)#This states the mechanism users will use to authenticate
     permission_classes = (permissions.UpdateOwnProfile,)#This dictates how the user will get the permission to do different things
+    filter_backends = (filters.SearchFilter,)#This adds a filter backend for the search filter
+    search_fields = ('name', 'email')#This tells filter backend which fields we want to make searchable by the filter
