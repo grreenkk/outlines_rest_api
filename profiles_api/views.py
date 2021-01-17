@@ -2,13 +2,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets
-
+from rest_framework.authentication import TokenAuthentication #this is the kind of token that users will use to authenticate themselves
+from . import permissions
 from profiles_api import serializers
+from . import models
 
 
 class HelloApiView(APIView):
     """Test API View"""
-    serializer_class = serializers. HelloSerializer
+    serializer_class = serializers.HelloSerializer
 
     def get(self, request, format=None):
         """Returns a list of APIView features"""
@@ -45,6 +47,9 @@ class HelloApiView(APIView):
     def delete(self, request, pk=None):
         """Delete an object in a database"""
         return Response({'method': 'DELETE'})
+
+
+
 
 
 class HelloViewSet(viewsets.ViewSet):
@@ -90,3 +95,11 @@ class HelloViewSet(viewsets.ViewSet):
     def destroy(self, request, pk=None):
         """handle removing an object"""
         return Response({'http_method': 'DELETE'})
+
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    """Handle creating and updating profiles"""
+    serializer_class = serializers.UserProfileSerializer
+    queryset = models.UserProfile.objects.all()
+    authentication_classes = (TokenAuthentication,)#This states the mechanism users will use to authenticate
+    permission_classes = (permissions.UpdateOwnProfile,)#This dictates how the user will get the permission to do different things
