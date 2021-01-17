@@ -4,6 +4,8 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication #this is the kind of token that users will use to authenticate themselves
 from rest_framework import filters
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.settings import api_settings
 from . import permissions
 from profiles_api import serializers
 from . import models
@@ -106,3 +108,8 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.UpdateOwnProfile,)#This dictates how the user will get the permission to do different things
     filter_backends = (filters.SearchFilter,)#This adds a filter backend for the search filter
     search_fields = ('name', 'email')#This tells filter backend which fields we want to make searchable by the filter
+
+class UserLoginApiView(ObtainAuthToken):
+    """Handle creating user authentication tokens"""
+    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES#This adds the renderer classes to our authtoken view which will enable it in django admin
+    #The viewsets and APIView authomatically have the rendered classes in the django admin except the authtoken which is why it is added manually
