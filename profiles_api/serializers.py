@@ -25,7 +25,7 @@ class UserProfileSerializer(serializers.ModelSerializer): #The ModelSerializer u
 
 
     def create(self, validated_data):#This overwrites the default create function belonging to the serializer and then uses our
-    # own created create_user function located under our UserProfileManager cla ss, used to create new users
+    # own created create_user function located under our UserProfileManager class, used to create new users
         """Create and return a new user"""
         user = models.UserProfile.objects.create_user(#The create_user function was created in out UserProfileManager under models.py
             email=validated_data['email'],
@@ -34,3 +34,12 @@ class UserProfileSerializer(serializers.ModelSerializer): #The ModelSerializer u
         )
 
         return user
+
+
+class ProfileFeedItemSerializer(serializers.ModelSerializer):
+    """Serializes profile feed items"""
+
+    class Meta:
+        model = models.ProfileFeedItem
+        fields = ('id', 'user_profile', 'status_text', 'created_on')
+        extra_kwargs = {'user_profile' : {'read_only': True}}

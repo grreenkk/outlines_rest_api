@@ -9,7 +9,7 @@ from rest_framework.settings import api_settings
 from . import permissions
 from profiles_api import serializers
 from . import models
-
+from rest_framework.permissions import IsAuthenticated
 
 class HelloApiView(APIView):
     """Test API View"""
@@ -102,8 +102,8 @@ class HelloViewSet(viewsets.ViewSet):
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     """Handle creating and updating profiles"""
-    serializer_class = serializers.UserProfileSerializer
-    queryset = models.UserProfile.objects.all()
+    serializer_class = serializers.UserProfileSerializer#Ths connects our viewset to the serializer
+    queryset = models.UserProfile.objects.all()#This will manage all userprofile objects from our model in our viewset
     authentication_classes = (TokenAuthentication,)#This states the mechanism users will use to authenticate
     permission_classes = (permissions.UpdateOwnProfile,)#This dictates how the user will get the permission to do different things
     filter_backends = (filters.SearchFilter,)#This adds a filter backend for the search filter
@@ -113,3 +113,14 @@ class UserLoginApiView(ObtainAuthToken):
     """Handle creating user authentication tokens"""
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES#This adds the renderer classes to our authtoken view which will enable it in django admin
     #The viewsets and APIView authomatically have the rendered classes in the django admin except the authtoken which is why it is added manually
+
+class UserProfileFeedViewSet(viewsets.ModelViewSet):
+    """Handles creating, reading and updating profile feed items"""
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = serializers.ProfileFeedItemSerializer
+    queryset = models.ProfileFeedItem.objects.all()
+    permission_classes = (permissions.UpdateOwnStatus, IsAuthenticated)
+
+    def perform_create(self, serializer):
+        """Sets the user profile to the logged in user"""
+        serializer.save(user_profile=self.request.user)
